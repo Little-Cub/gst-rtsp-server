@@ -127,11 +127,16 @@ main (int argc, char *argv[])
    * any launch line works as long as it contains elements named pay%d. Each
    * element with pay%d names will be a stream */
   factory = gst_rtsp_media_factory_new ();
-  gst_rtsp_media_factory_set_launch (factory, "( "
-      "videotestsrc ! video/x-raw,width=352,height=288,framerate=15/1 ! "
-      "x264enc ! rtph264pay name=pay0 pt=96 "
-      "audiotestsrc ! audio/x-raw,rate=8000 ! "
-      "alawenc ! rtppcmapay name=pay1 pt=97 " ")");
+  gst_rtsp_media_factory_set_launch (factory,
+  "( "
+    "v4l2src device=/dev/video1 ! "
+    "image/jpeg,format=MJPG,width=640,height=480,framerate=30/1 ! "
+    "jpegdec ! "
+    "videoconvert ! "
+    "x264enc tune=zerolatency bitrate=2000 speed-preset=ultrafast ! "
+    "rtph264pay name=pay0 pt=96 "
+  ")"
+);
 #ifdef WITH_AUTH
   /* add permissions for the user media role */
   permissions = gst_rtsp_permissions_new ();
@@ -162,7 +167,7 @@ main (int argc, char *argv[])
 #ifdef WITH_TLS
   g_print ("stream ready at rtsps://127.0.0.1:8554/test\n");
 #else
-  g_print ("stream ready at rtsp://127.0.0.1:8554/test\n");
+  g_print ("stream ready at rtsps://%s/test\n", gst_rtsp_server_get_address(server));
 #endif
   g_main_loop_run (loop);
 

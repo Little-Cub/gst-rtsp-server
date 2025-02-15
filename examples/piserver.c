@@ -1,11 +1,13 @@
 #include <gst/gst.h>
 #include <gst/rtsp-server/rtsp-server.h>
 
+const char* IP = "141.219.243.219";
+const char* PORT = "8554";
+
 /* this timeout is periodically run to clean up the expired sessions from the
  * pool. This needs to be run explicitly currently but might be done
  * automatically as part of the mainloop. */
-static gboolean
-timeout (GstRTSPServer * server)
+static gboolean timeout (GstRTSPServer * server)
 {
   GstRTSPSessionPool *pool;
 
@@ -16,8 +18,7 @@ timeout (GstRTSPServer * server)
   return TRUE;
 }
 
-int
-main (int argc, char *argv[])
+int main (int argc, char *argv[])
 {
   GMainLoop *loop;
   GstRTSPServer *server;
@@ -31,16 +32,24 @@ main (int argc, char *argv[])
   /* create a server instance */
   server = gst_rtsp_server_new ();
 
+  gst_rtsp_server_set_address(server, IP);
+  gst_rtsp_server_set_service(server, PORT);
+
 
   mounts = gst_rtsp_server_get_mount_points (server);
 
   
   factory = gst_rtsp_media_factory_new ();
-  gst_rtsp_media_factory_set_launch (factory, "( "
-      "videotestsrc ! video/x-raw,width=352,height=288,framerate=30/1 ! "
-      "x264enc ! rtph264pay name=pay0 pt=96 "
-      "audiotestsrc ! audio/x-raw,rate=8000 ! "
-      "alawenc ! rtppcmapay name=pay1 pt=97 " ")");
+  // gst_rtsp_media_factory_set_launch (factory, "( "
+  //     "/dev/video0 ! video/x-raw,width=352,height=288,framerate=30/1 ! "
+  //     "x264enc ! rtph264pay name=pay0 pt=96 "
+  //     "audiotestsrc ! audio/x-raw,rate=8000 ! "
+  //     "alawenc ! rtppcmapay name=pay1 pt=97 " ")");
+  gst_rtsp_media_factory_set_launch(factory, "( "
+      "v4l2src device=/dev/video0 ! video/x-raw,format=YUY2,width=352,height=288,framerate=30/1 ! "
+      "videoconvert ! video/x-raw,format=I420 ! "
+      "x264enc speed-preset=ultrafast ! rtph264pay name=pay0 pt=96 "
+      ")");
 
   /* attach the test factory to the /test url */
   gst_rtsp_mount_points_add_factory (mounts, "/test", factory);
@@ -57,9 +66,9 @@ main (int argc, char *argv[])
 
   /* start serving, this never stops */
 #ifdef WITH_TLS
-  g_print ("stream ready at rtsps://127.0.0.1:8554/test\n");
+  g_print ("stream ready at rtsps://141.219.242.127:8554/test\n");
 #else
-  g_print ("stream ready at rtsp://127.0.0.1:8554/test\n");
+  g_print ("stream ready at rtsp://%s:%s/test\n", IP, PORT);
 #endif
   g_main_loop_run (loop);
 

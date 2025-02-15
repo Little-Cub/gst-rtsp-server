@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "readme": "cpp"
+    },
+    "C_Cpp.default.compileCommands": "/home/serc/SERC/gst-rtsp-server/builddir/compile_commands.json",
+    "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild"
+}
