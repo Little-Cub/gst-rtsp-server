@@ -1,0 +1,4 @@
+[submodule "path/to/submodule"]
+	branch = master
+[submodule "~/SERC/gst-rtsp-server"]
+	branch = master
