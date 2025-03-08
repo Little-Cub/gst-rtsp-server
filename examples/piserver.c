@@ -1,8 +1,8 @@
 #include <gst/gst.h>
 #include <gst/rtsp-server/rtsp-server.h>
 
-const char* IP = "141.219.243.219";
-const char* PORT = "8554";
+const char *IP = "141.219.243.219";
+const char *PORT = "8554";
 
 /* this timeout is periodically run to clean up the expired sessions from the
  * pool. This needs to be run explicitly currently but might be done
@@ -48,6 +48,7 @@ int main (int argc, char *argv[])
   gst_rtsp_media_factory_set_launch(factory, "( "
       "v4l2src device=/dev/video0 ! video/x-raw,format=YUY2,width=352,height=288,framerate=30/1 ! "
       "videoconvert ! video/x-raw,format=I420 ! "
+      //"theoraenc ! rtptheorapay name=pay0 pt=96 "
       "x264enc speed-preset=ultrafast ! rtph264pay name=pay0 pt=96 "
       ")");
 
