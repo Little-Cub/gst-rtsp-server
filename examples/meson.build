@@ -18,7 +18,7 @@ examples = [
   # 'test-replay-server',
   # 'test-sdp',
   # 'test-uri',
-  'test-video',
+  # 'test-video',
   # 'test-video-rtx',
   'piserver',
 ]
